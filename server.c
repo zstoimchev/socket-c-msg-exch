@@ -6,6 +6,25 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
+#include <pthread.h>
+
+void *handle_client(void *arg) {
+  int newsock = *(int *)arg;
+  free(arg);
+
+  char buffer[1024] = { 0 };
+  char *hello = "Server: Hello from the server\n";
+
+  while (1) {
+    ssize_t valread = read(newsock, buffer, 1024 - 1); // subtract 1 for the null terminator at the end
+    printf("Client: %s", buffer);
+    send(newsock, hello, strlen(hello), 0);
+    //printf("Hello message sent\n"); 
+  }
+
+  close(newsock);
+  return NULL;
+}
 
 int main() {
   struct sockaddr_in my_addr;
@@ -36,25 +55,24 @@ int main() {
     printf("Error in listening");
   }
 
-  //accept
-  // int accept (int sockfd, struct sockaddr *fromaddr, socklen_t *addrlen);
-  if ((newsock = accept(sockfd, (struct sockaddr *) &my_addr, &addrlen)) < 0 ) {
-    perror("accept");
-    printf("Error accepting client");
-    exit(1);
-  }
-
-  char buffer[1024] = { 0 };
-  char*hello = "Server: Hello from the server\n";
-
   while (1) {
-    valread = read(newsock, buffer, 1024 - 1); // subtract 1 for the null terminator at the end
-    printf("Client: %s", buffer);
-    send(newsock, hello, strlen(hello), 0);
-    //printf("Hello message sent\n"); 
+    //accept
+    int *newsock = malloc(sizeof(int));
+    if ((*newsock = accept(sockfd, (struct sockaddr *) &my_addr, &addrlen)) < 0 ) {
+      perror("accept");
+      printf("Error accepting client");
+      exit(1);
+    }
+
+    pthread_t thread_id;
+    if (pthread_create(&thread_id, NULL, &handle_client, newsock) != 0) {
+      printf("Error creating a thread\n");
+      exit(1);
+    }
+    pthread_detach(thread_id); // deatach the thread
   }
   
-  close(newsock);
+  // close(newsock);
   close(sockfd);
   return 0;	
 }
