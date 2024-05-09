@@ -9,6 +9,7 @@
 #include <pthread.h>
 
 void *handle_client(void *arg) {
+  pthread_t thread_id = pthread_self();
   int newsock = *(int *)arg;
   free(arg);
 
@@ -16,9 +17,14 @@ void *handle_client(void *arg) {
   char *hello = "Server: Hello from the server\n";
 
   while (1) {
-    ssize_t valread = read(newsock, buffer, 1024 - 1); // subtract 1 for the null terminator at the end
-    printf("Client: %s", buffer);
-    send(newsock, hello, strlen(hello), 0);
+    memset(buffer, 0, sizeof(buffer));  // clear buffer
+    ssize_t valread = read(newsock, buffer, sizeof(buffer) - 1); // subtract 1 for the null terminator
+    if (valread <= 0) { // read is NULL
+      printf("client error must disconnect it");
+      break;
+    }
+    printf("Client (Thread ID: %lu): %s", thread_id, buffer);
+    //send(newsock, hello, strlen(hello), 0);
     //printf("Hello message sent\n"); 
   }
 
