@@ -1,5 +1,7 @@
 # This is TODO list for features to be implemented
 
+- Client code: make code for connecting client
+
 - Add IP to each client, so they are distinct
 
 - Broadcast all the messages to each client, display them as in the server terminal
