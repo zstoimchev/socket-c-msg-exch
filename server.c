@@ -8,13 +8,28 @@
 #include <string.h>
 #include <pthread.h>
 
+// global variables here
+int client_sockets[10];
+int client_socket_index = 0;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
 void *handle_client(void *arg) {
   pthread_t thread_id = pthread_self();
   int newsock = *(int *) arg;
   free(arg);
 
   char buffer[1024] = { 0 };
-  char *hello = "Server: Hello from the server\n";
+  
+  pthread_mutex_lock(&mutex);
+  if (client_socket_index < 10) {
+    client_sockets[client_socket_index++] = newsock;
+  } else {
+    printf("Maximum number of connected clients reached!\n");
+    close(newsock);
+    pthread_mutex_unlock(&mutex);
+    return NULL;
+  }
+  pthread_mutex_unlock(&mutex);
 
   while (1) {
     memset(buffer, 0, sizeof(buffer));  // clear buffer
@@ -29,7 +44,14 @@ void *handle_client(void *arg) {
     // TODO: need to send the same from abode to all clients connected using send command
     char result[2048];
     sprintf(result, "Client (Thread ID: %lu): %s\n", thread_id, buffer);
-    send(newsock, result, strlen(result), 0);
+    //send(newsock, result, strlen(result), 0);
+    pthread_mutex_lock(&mutex);
+    for (int i = 0; i < client_socket_index; i++) {
+      if(client_sockets[i] == newsock)
+        continue;
+      send(client_sockets[i], result, strlen(result), 0);
+    }
+    pthread_mutex_unlock(&mutex);
   }
 
   close(newsock);
