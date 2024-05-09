@@ -23,9 +23,13 @@ void *handle_client(void *arg) {
       printf("Client %lu DISCONNECTED!\n", thread_id);
       break;
     }
+
     printf("Client (Thread ID: %lu): %s", thread_id, buffer);
-    //send(newsock, hello, strlen(hello), 0);
-    //printf("Hello message sent\n"); 
+    
+    // TODO: need to send the same from abode to all clients connected using send command
+    char result[2048];
+    sprintf(result, "Client (Thread ID: %lu): %s\n", thread_id, buffer);
+    send(newsock, result, strlen(result), 0);
   }
 
   close(newsock);
