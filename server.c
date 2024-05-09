@@ -10,7 +10,7 @@
 
 void *handle_client(void *arg) {
   pthread_t thread_id = pthread_self();
-  int newsock = *(int *)arg;
+  int newsock = *(int *) arg;
   free(arg);
 
   char buffer[1024] = { 0 };
@@ -20,7 +20,7 @@ void *handle_client(void *arg) {
     memset(buffer, 0, sizeof(buffer));  // clear buffer
     ssize_t valread = read(newsock, buffer, sizeof(buffer) - 1); // subtract 1 for the null terminator
     if (valread <= 0) { // read is NULL
-      printf("client error must disconnect it");
+      printf("Client %lu DISCONNECTED!\n", thread_id);
       break;
     }
     printf("Client (Thread ID: %lu): %s", thread_id, buffer);
