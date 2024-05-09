@@ -1,9 +1,3 @@
-//#include <stdlib.h>
-//#include <arpa/inet.h>
-//#include <string.h>
-//#include <sys/socket.h>
-//#include <unistd.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
@@ -12,8 +6,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
-//#include <pthread.h>
-
+#include <pthread.h>
 
 int main() {
   struct sockaddr_in server_addr;
@@ -36,14 +29,18 @@ int main() {
     exit(1);
   }
 
-  char* hello = "hello from the other size";
+  char* hello = "hello from the other side\n";
 
   char buffer[1024] = { 0 };
-  send(clientfd, hello, strlen(hello), 0);
-  printf("msg sent");
-  int valread = read(clientfd, buffer, sizeof(buffer) - 1);
-  printf("%s\n", buffer);
-
+  while (1) {
+    printf("Me: ");
+    fgets(buffer, sizeof(buffer) - 1, stdin);
+    send(clientfd, buffer, strlen(buffer), 0);
+  }
+  //send(clientfd, hello, strlen(hello), 0);
+  //printf("msg sent");
+  
+  close(clientfd);
   return 0;
 
 
