@@ -8,6 +8,46 @@
 #include <string.h>
 #include <pthread.h>
 
+/*
+void* handle_incomming_msg(void *arg) {
+  int newsock = *(int *) arg;
+  free(arg);
+
+  char buffer[1024] = { 0 };
+  while (1) {
+    memset(buffer, 0, sizeof(buffer));
+    ssize_t valread = read(newsock, buffer, sizeof(buffer) - 1);
+    if (valread <= 0) {
+      printf("read empty\n");
+    }
+    printf("Client some: %s\n", buffer);
+  }
+}
+*/
+
+void* handle_incoming_msg(void *arg) {
+    int newsock = *(int *)arg;
+    // free(arg);
+
+    char buffer[1024]; // No need to initialize with zeros
+    ssize_t valread;
+
+    while ((valread = read(newsock, buffer, sizeof(buffer) - 1)) > 0) {
+        buffer[valread] = '\0'; // Null-terminate the received message
+        printf("Client message: %s\n", buffer);
+    }
+
+    if (valread == 0) {
+        printf("Client disconnected\n");
+    } else {
+        perror("read");
+        printf("Error reading from client\n");
+    }
+
+    close(newsock); // Close the socket
+    return NULL;
+}
+
 int main() {
   struct sockaddr_in server_addr;
   int clientfd;
@@ -31,6 +71,14 @@ int main() {
 
   char* hello = "hello from the other side\n";
 
+
+  pthread_t thread_incoming;
+  if (pthread_create(&thread_incoming, NULL, &handle_incoming_msg, (void *) &clientfd) != 0) {
+    printf("Error threading incomming messages\n");
+    exit(1);
+  }
+
+
   char buffer[1024] = { 0 };
   while (1) {
     printf("Me: ");
@@ -39,9 +87,11 @@ int main() {
   }
   //send(clientfd, hello, strlen(hello), 0);
   //printf("msg sent");
+
+  if (pthread_join(thread_incoming, NULL) != 0) {
+    printf("Error joining the incoming thread\n");
+  }
   
   close(clientfd);
   return 0;
-
-
 }
