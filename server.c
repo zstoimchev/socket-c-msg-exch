@@ -7,9 +7,11 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
+#include "declarations.h"
 
 // global variables here
-int client_sockets[10];
+//int client_sockets[10];
+Client* head = NULL;
 int client_socket_index = 0;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -22,7 +24,9 @@ void *handle_client(void *arg) {
   
   pthread_mutex_lock(&mutex);
   if (client_socket_index < 10) {
-    client_sockets[client_socket_index++] = newsock;
+    //client_sockets[client_socket_index++] = newsock;
+    insert(&head, newsock);
+    client_socket_index++;
   } else {
     printf("Maximum number of connected clients reached!\n");
     close(newsock);
@@ -36,21 +40,23 @@ void *handle_client(void *arg) {
     ssize_t valread = read(newsock, buffer, sizeof(buffer) - 1); // subtract 1 for the null terminator
     if (valread <= 0) { // read is NULL
       printf("Client %lu DISCONNECTED!\n", thread_id);
+      delete(&head, newsock);
+      client_socket_index--;
       break;
     }
 
     printf("Client (Thread ID: %lu): %s", thread_id, buffer);
     
-    // TODO: need to send the same from abode to all clients connected using send command
     char result[2048];
     sprintf(result, "Client (Thread ID: %lu): %s\n", thread_id, buffer);
-    //send(newsock, result, strlen(result), 0);
+
     pthread_mutex_lock(&mutex);
-    for (int i = 0; i < client_socket_index; i++) {
-      if(client_sockets[i] == newsock)
-        continue;
-      send(client_sockets[i], result, strlen(result), 0);
-    }
+    broadcast(&head, newsock, result);
+    //for (int i = 0; i < client_socket_index; i++) {
+      //if(client_sockets[i] == newsock)
+      //  continue;
+    //  send(client_sockets[i], result, strlen(result), 0);
+    //}
     pthread_mutex_unlock(&mutex);
   }
 
