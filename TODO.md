@@ -2,9 +2,9 @@
 
 - Client code: make code for connecting client: <b>DONE</b>
 
-- Add IP to each client, so they are distinct: <b>meh</b>, they are distinct... (all have unique ID)
+- Add IP to each client, so they are distinct: <b>meh</b>
 
-- Broadcast all the messages to every client, in real time
+- Broadcast all the messages to every client, in real time: <b>DONE</b>
 
 - Encrypt the messages
 
