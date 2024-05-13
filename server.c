@@ -48,7 +48,8 @@ void *handle_client(void *arg) {
     printf("Client (Thread ID: %lu): %s", thread_id, buffer);
     
     char result[2048];
-    sprintf(result, "Client (Thread ID: %lu): %s\n", thread_id, buffer);
+    //sprintf(result, "Client (Thread ID: %lu): %s", thread_id, buffer);
+    sprintf(result, "\033[1;31mClient (Thread ID: %lu): %s\033[0m", thread_id, buffer);
 
     pthread_mutex_lock(&mutex);
     broadcast(&head, newsock, result);

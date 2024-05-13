@@ -8,23 +8,6 @@
 #include <string.h>
 #include <pthread.h>
 
-/*
-void* handle_incomming_msg(void *arg) {
-  int newsock = *(int *) arg;
-  free(arg);
-
-  char buffer[1024] = { 0 };
-  while (1) {
-    memset(buffer, 0, sizeof(buffer));
-    ssize_t valread = read(newsock, buffer, sizeof(buffer) - 1);
-    if (valread <= 0) {
-      printf("read empty\n");
-    }
-    printf("Client some: %s\n", buffer);
-  }
-}
-*/
-
 void* handle_incoming_msg(void *arg) {
     int newsock = *(int *)arg;
     // free(arg);
@@ -34,7 +17,7 @@ void* handle_incoming_msg(void *arg) {
 
     while ((valread = read(newsock, buffer, sizeof(buffer) - 1)) > 0) {
         buffer[valread] = '\0'; // Null-terminate the received message
-        printf("Client message: %s\n", buffer);
+        printf("%s", buffer);
     }
 
     if (valread == 0) {
@@ -69,8 +52,6 @@ int main() {
     exit(1);
   }
 
-  char* hello = "hello from the other side\n";
-
 
   pthread_t thread_incoming;
   if (pthread_create(&thread_incoming, NULL, &handle_incoming_msg, (void *) &clientfd) != 0) {
@@ -81,7 +62,7 @@ int main() {
 
   char buffer[1024] = { 0 };
   while (1) {
-    printf("Me: ");
+//    printf("Me: ");
     fgets(buffer, sizeof(buffer) - 1, stdin);
     send(clientfd, buffer, strlen(buffer), 0);
   }

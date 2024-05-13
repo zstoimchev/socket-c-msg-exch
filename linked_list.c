@@ -51,11 +51,14 @@ void print_list(Client* head) {
     printf("NULL\n");
 }
 
-void broadcast(Client** head, int source, char* result) {
-  while(*head != NULL) {
-    send((*head)->data, result, strlen(result), 0);
-    *head = (*head)->next;
-  }
+void broadcast(Client** head_ref, int source, char* result) {
+    Client* temp = *head_ref;
+    while(temp != NULL) {
+        if(temp->data != source) {
+            send(temp->data, result, strlen(result), 0);
+        }
+        temp = temp->next;
+    }
 }
 
 void free_list(Client* head) {
