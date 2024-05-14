@@ -20,18 +20,21 @@ Use the following commands to compile the code:
 ```bash
 gcc -o server server.c -lssl -lcrypto -lpthread
 gcc -o client client.c -lssl -lcrypto -lpthread
+```
 
-Usage
+## Usage
 After compiling the code, you can run the server using the following command:
-
+```bash
 ./server
+```
 
 Then, in a new terminal window, you can run the client using the following command:
-
+```bash
 ./client
+```
 
-Contributing
+## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-License
+## License
 MIT
