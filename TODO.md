@@ -6,16 +6,16 @@
 
 - Broadcast all the messages to every client, in real time: <b>DONE</b>
 
-- Encrypt the messages
+- Encrypt the messages with openSSL? maybe: <b>ErR</b>
 
 - Ability to send private messages, from one to another client
 
 - Distributivity/Decentralization: make it not depend on central server
 
-- 
+- . 
 
-- 
+- .
 
-- 
+- .
 
 The list above can be updated at any time, depending on needs and ideas.
